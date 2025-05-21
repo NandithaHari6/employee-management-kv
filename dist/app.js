@@ -13,18 +13,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const employee_router_1 = __importDefault(require("./employee_router"));
+const employee_route_1 = __importDefault(require("./routes/employee.route"));
 const loggerMiddleware_1 = __importDefault(require("./loggerMiddleware"));
-const data_source_1 = __importDefault(require("./data-source"));
+const data_source_1 = __importDefault(require("./db/data-source"));
+const error_middleware_1 = require("./middlewares/error.middleware");
 const { Client } = require('pg');
 const server = (0, express_1.default)();
 server.use(express_1.default.json());
 server.use(loggerMiddleware_1.default);
-server.use("/employee", employee_router_1.default);
+server.use("/employee", employee_route_1.default);
+server.use(error_middleware_1.errorHandler);
 server.get("/", (req, res) => {
     console.log(req.url);
     res.status(200).send("Hello world typescript");
 });
+// server.use(errorHandler)
 // Database connection configuration
 // const dbConfig = {
 //   user: 'postgres',

@@ -1,7 +1,8 @@
 import express from "express";
-import employeeRouter from "./employee_router";
+import employeeRouter from "./routes/employee.route";
 import loggerMiddleware from "./loggerMiddleware"
-import datasource from './data-source'
+import datasource from "./db/data-source";
+import { errorHandler } from "./middlewares/error.middleware";
 const { Client } = require('pg');
 
 const server = express();
@@ -9,12 +10,12 @@ server.use(express.json());
 server.use(loggerMiddleware);
 
 server.use("/employee", employeeRouter);
-
+server.use(errorHandler)
 server.get("/", (req, res) => {
   console.log(req.url);
   res.status(200).send("Hello world typescript");
 });
-
+// server.use(errorHandler)
 // Database connection configuration
 // const dbConfig = {
 //   user: 'postgres',
