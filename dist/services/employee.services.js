@@ -18,7 +18,7 @@ class EmployeeService {
     constructor(emmployeeRepository) {
         this.emmployeeRepository = emmployeeRepository;
     }
-    createEmployee(email, name, age, address) {
+    createEmployee(email, name, age, address, password, role) {
         return __awaiter(this, void 0, void 0, function* () {
             const newEmp = new employee_entity_1.default();
             newEmp.name = name;
@@ -28,6 +28,8 @@ class EmployeeService {
             addressObj.line1 = address.line1;
             addressObj.pincode = address.pincode;
             newEmp.address = addressObj;
+            newEmp.password = password;
+            newEmp.role = role;
             return this.emmployeeRepository.create(newEmp);
         });
     }
@@ -41,13 +43,23 @@ class EmployeeService {
             return this.emmployeeRepository.findOneById(id);
         });
     }
-    updateEmployee(id, email, name) {
+    getEmployeeByEmail(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.emmployeeRepository.getByMail(email);
+        });
+    }
+    updateEmployee(id, email, name, address, age) {
         return __awaiter(this, void 0, void 0, function* () {
             const exsistingEmployee = yield this.emmployeeRepository.findOneById(id);
             if (exsistingEmployee) {
                 const employee = new employee_entity_1.default();
                 employee.name = name;
                 employee.email = email;
+                const addressObj = new address_entitiy_1.default();
+                addressObj.line1 = address.line1;
+                addressObj.pincode = address.pincode;
+                employee.address = addressObj;
+                employee.age = age;
                 yield this.emmployeeRepository.update(id, employee);
             }
         });

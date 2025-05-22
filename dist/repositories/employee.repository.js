@@ -20,12 +20,26 @@ class EmployeeRepository {
     }
     findMany() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.repository.find({});
+            return this.repository.find({
+                relations: {
+                    address: true,
+                }
+            });
+        });
+    }
+    getByMail(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.repository.findOneBy({ email });
         });
     }
     findOneById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.repository.findOneBy({ id });
+            return this.repository.findOne({
+                relations: {
+                    address: true,
+                },
+                where: { id }
+            });
         });
     }
     update(id, employee) {

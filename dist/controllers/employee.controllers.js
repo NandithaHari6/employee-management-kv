@@ -13,17 +13,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const httpException_1 = __importDefault(require("../exception/httpException"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 const employee_dto_1 = require("../dto/employee.dto");
+const update_dto_1 = require("../dto/update.dto");
+const authorization_middleware_1 = __importDefault(require("../middlewares/authorization.middleware"));
+// import checkRole, { authorizationMiddleware } from "../middlewares/authorization.middleware";
 class EmployeeController {
     constructor(employeeService, router) {
         this.employeeService = employeeService;
         this.router = router;
         router.get("/", this.getAllEmployees.bind(this));
-        router.post("/", this.createEmployee.bind(this));
-        router.put("/:id", this.updateEmployee.bind(this));
-        router.delete("/:id", this.deleteEmployee.bind(this));
+        router.post("/", (0, authorization_middleware_1.default)("HR"), this.createEmployee.bind(this));
+        router.put("/:id", (0, authorization_middleware_1.default)("HR"), this.updateEmployee.bind(this));
+        router.delete("/:id", (0, authorization_middleware_1.default)("HR"), this.deleteEmployee.bind(this));
         router.get("/:id", this.getEmployeeById.bind(this));
     }
     createEmployee(req, res, next) {
@@ -35,7 +39,8 @@ class EmployeeController {
                     console.log(JSON.stringify(errors));
                     throw new httpException_1.default(400, JSON.stringify(errors));
                 }
-                const savedEmployee = yield this.employeeService.createEmployee(createEmployeeDto.email, createEmployeeDto.name, createEmployeeDto.age, createEmployeeDto.address);
+                const hashedPassword = yield bcrypt_1.default.hash(createEmployeeDto.password, 10);
+                const savedEmployee = yield this.employeeService.createEmployee(createEmployeeDto.email, createEmployeeDto.name, createEmployeeDto.age, createEmployeeDto.address, hashedPassword, createEmployeeDto.role);
                 res.status(201).send(savedEmployee);
             }
             catch (error) {
@@ -58,6 +63,7 @@ class EmployeeController {
     }
     getAllEmployees(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(req.user);
             const employees = yield this.employeeService.getAllEmployees();
             res.status(200).send(employees);
         });
@@ -78,13 +84,26 @@ class EmployeeController {
             }
         });
     }
-    updateEmployee(req, res) {
+    updateEmployee(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = Number(req.params.id);
-            const name = req.body.name;
-            const email = req.body.email;
-            yield this.employeeService.updateEmployee(id, email, name);
-            res.status(200).send("Updated");
+            try {
+                const createEmployeeDto = (0, class_transformer_1.plainToInstance)(update_dto_1.UpdateEmployeeDto, req.body);
+                const errors = yield (0, class_validator_1.validate)(createEmployeeDto);
+                if (errors.length > 0) {
+                    console.log(JSON.stringify(errors));
+                    throw new httpException_1.default(400, JSON.stringify(errors));
+                }
+                yield this.employeeService.updateEmployee(id, createEmployeeDto.email, createEmployeeDto.name, createEmployeeDto.address, createEmployeeDto.age);
+                res.status(201).send();
+            }
+            catch (error) {
+                next(error);
+            }
+            //          const name=req.body.name;
+            //     const email=req.body.email;
+            //     await this.employeeService.updateEmployee(id,email,name,req.body.address,req.body.age);
+            //     res.status(200).send("Updated")
         });
     }
     deleteEmployee(req, res) {

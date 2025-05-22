@@ -9,10 +9,22 @@ class EmployeeRepository{
         return this.repository.save(employee);
     }
     async findMany():Promise<Employee[]>{
-        return this.repository.find({});
+        return this.repository.find({
+    relations: {
+        address: true,
+    }
+});
+    }
+    async getByMail(email:string):Promise<Employee>{
+        return this.repository.findOneBy({email})
     }
     async findOneById(id:number):Promise<Employee>{
-        return this.repository.findOneBy({ id });
+        return this.repository.findOne({
+    relations: {
+        address: true,
+    },
+    where :{id}
+});
     }
     async update(id:number, employee:Employee):Promise<void>{
         await this.repository.save({id,...employee})

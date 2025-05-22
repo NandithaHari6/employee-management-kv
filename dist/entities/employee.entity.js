@@ -12,9 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.EmployeeRole = void 0;
 const typeorm_1 = require("typeorm");
 const abstract_entity_1 = __importDefault(require("./abstract.entity"));
 const address_entitiy_1 = __importDefault(require("./address.entitiy"));
+var EmployeeRole;
+(function (EmployeeRole) {
+    EmployeeRole["UI"] = "UI";
+    EmployeeRole["UX"] = "UX";
+    EmployeeRole["DEVELOPER"] = "DEVELOPER";
+    EmployeeRole["HR"] = "HR";
+})(EmployeeRole || (exports.EmployeeRole = EmployeeRole = {}));
 let Employee = class Employee extends abstract_entity_1.default {
 };
 __decorate([
@@ -37,6 +45,17 @@ __decorate([
     (0, typeorm_1.JoinColumn)(),
     __metadata("design:type", address_entitiy_1.default)
 ], Employee.prototype, "address", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: false }),
+    __metadata("design:type", String)
+], Employee.prototype, "password", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'enum',
+        enum: EmployeeRole,
+        default: EmployeeRole.DEVELOPER
+    }),
+    __metadata("design:type", String)
+], Employee.prototype, "role", void 0);
 Employee = __decorate([
     (0, typeorm_1.Entity)()
 ], Employee);
