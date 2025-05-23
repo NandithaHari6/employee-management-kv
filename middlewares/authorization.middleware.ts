@@ -14,6 +14,7 @@ export default function checkRole(specified_role){
 
     return ((req:Request,res:Response,next:NextFunction)=>{
     const role=req.user?.role
+    console.log(role,specified_role)
     if(role!== specified_role){
             throw new HttpException(403, "User has no privilage to access")
     }

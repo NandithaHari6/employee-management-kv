@@ -40,7 +40,7 @@ class EmployeeController {
                     throw new httpException_1.default(400, JSON.stringify(errors));
                 }
                 const hashedPassword = yield bcrypt_1.default.hash(createEmployeeDto.password, 10);
-                const savedEmployee = yield this.employeeService.createEmployee(createEmployeeDto.email, createEmployeeDto.name, createEmployeeDto.age, createEmployeeDto.address, hashedPassword, createEmployeeDto.role);
+                const savedEmployee = yield this.employeeService.createEmployee(createEmployeeDto.employeeId, createEmployeeDto.dateOfJoining, createEmployeeDto.experience, createEmployeeDto.status, createEmployeeDto.dept_id, createEmployeeDto.email, createEmployeeDto.name, createEmployeeDto.age, createEmployeeDto.address, hashedPassword, createEmployeeDto.role);
                 res.status(201).send(savedEmployee);
             }
             catch (error) {
@@ -61,11 +61,18 @@ class EmployeeController {
             //     }
         });
     }
-    getAllEmployees(req, res) {
+    getAllEmployees(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(req.user);
-            const employees = yield this.employeeService.getAllEmployees();
-            res.status(200).send(employees);
+            try {
+                const employees = yield this.employeeService.getAllEmployees();
+                if (employees.length === 0) {
+                    throw new httpException_1.default(404, "No employees to display");
+                }
+                res.status(200).send(employees);
+            }
+            catch (err) {
+                next(err);
+            }
         });
     }
     getEmployeeById(req, res, next) {
@@ -106,10 +113,16 @@ class EmployeeController {
             //     res.status(200).send("Updated")
         });
     }
-    deleteEmployee(req, res) {
+    deleteEmployee(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = Number(req.params.id);
-            yield this.employeeService.deleteEmployee(id);
+            try {
+                yield this.employeeService.deleteEmployee(id);
+                res.status(200).send("Deleted");
+            }
+            catch (err) {
+                next(err);
+            }
         });
     }
 }

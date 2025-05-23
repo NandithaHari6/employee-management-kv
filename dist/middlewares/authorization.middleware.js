@@ -16,6 +16,7 @@ function checkRole(specified_role) {
     return ((req, res, next) => {
         var _a;
         const role = (_a = req.user) === null || _a === void 0 ? void 0 : _a.role;
+        console.log(role, specified_role);
         if (role !== specified_role) {
             throw new httpException_1.default(403, "User has no privilage to access");
         }

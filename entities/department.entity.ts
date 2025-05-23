@@ -5,13 +5,15 @@ import Employee from "./employee.entity";
 class Department extends AbstractEntity{
 
 
-   @Column()
+   @Column({unique:true})
    dept_name:string
 
 
-    @OneToMany(()=>Employee,(employee)=>employee.department)
-    employee:Employee;
+    @OneToMany(()=>Employee,(employee)=>employee.department,{
+        
+    })
+    employee:Employee[];
 
   }
   
-  export default Department;
+export default Department;

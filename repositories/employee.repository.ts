@@ -12,6 +12,7 @@ class EmployeeRepository{
         return this.repository.find({
     relations: {
         address: true,
+        department:true
     }
 });
     }
@@ -22,12 +23,16 @@ class EmployeeRepository{
         return this.repository.findOne({
     relations: {
         address: true,
+        department:true
     },
     where :{id}
 });
     }
     async update(id:number, employee:Employee):Promise<void>{
         await this.repository.save({id,...employee})
+    }
+    async updateEmpDept(employee:Employee){
+        await this.repository.save(employee)
     }
     async delete(id:number):Promise<void>{
         const emp=await this.repository.findOneBy({id})

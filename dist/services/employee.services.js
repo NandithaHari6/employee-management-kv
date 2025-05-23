@@ -14,27 +14,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const employee_entity_1 = __importDefault(require("../entities/employee.entity"));
 const address_entitiy_1 = __importDefault(require("../entities/address.entitiy"));
+const logger_service_1 = require("./logger.service");
 class EmployeeService {
-    constructor(emmployeeRepository) {
+    constructor(emmployeeRepository, departmentRepository) {
         this.emmployeeRepository = emmployeeRepository;
+        this.departmentRepository = departmentRepository;
+        this.logger = logger_service_1.LoggerService.getInstance(EmployeeService.name);
     }
-    createEmployee(email, name, age, address, password, role) {
+    createEmployee(employeeId, dateOfJoining, experience, status, dept_id, email, name, age, address, password, role) {
         return __awaiter(this, void 0, void 0, function* () {
             const newEmp = new employee_entity_1.default();
             newEmp.name = name;
             newEmp.email = email;
             newEmp.age = age;
+            newEmp.status = status,
+                newEmp.employeeId = employeeId;
+            newEmp.dateOfJoining = dateOfJoining;
+            newEmp.experience = experience;
+            const dept_obj = yield this.departmentRepository.findOne(dept_id);
+            newEmp.department = dept_obj;
             const addressObj = new address_entitiy_1.default();
             addressObj.line1 = address.line1;
             addressObj.pincode = address.pincode;
+            addressObj.line2 = address.line2;
+            addressObj.houseNo = address.houseNo;
             newEmp.address = addressObj;
             newEmp.password = password;
             newEmp.role = role;
+            this.logger.info("New employee object being created");
             return this.emmployeeRepository.create(newEmp);
         });
     }
     getAllEmployees() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.logger.info("Getting all employees");
             return this.emmployeeRepository.findMany();
         });
     }
@@ -67,6 +80,7 @@ class EmployeeService {
                 addressObj.pincode = address.pincode;
                 employee.address = addressObj;
                 employee.age = age;
+                this.logger.info("Employee being updated");
                 yield this.emmployeeRepository.update(id, employee);
             }
         });
@@ -74,8 +88,10 @@ class EmployeeService {
     deleteEmployee(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const exsistingEmployee = yield this.emmployeeRepository.findOneById(id);
-            if (exsistingEmployee) {
+            if (!exsistingEmployee) {
                 yield this.emmployeeRepository.delete(id);
+            }
+            else {
             }
         });
     }

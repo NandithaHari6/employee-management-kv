@@ -20,6 +20,7 @@ const error_middleware_1 = require("./middlewares/error.middleware");
 const auth_route_1 = __importDefault(require("./routes/auth.route"));
 const auth_middleware_1 = require("./middlewares/auth.middleware");
 const logger_service_1 = require("./services/logger.service");
+const department_route_1 = __importDefault(require("./routes/department.route"));
 const { Client } = require('pg');
 const server = (0, express_1.default)();
 const logger = logger_service_1.LoggerService.getInstance('app()');
@@ -27,6 +28,7 @@ server.use(express_1.default.json());
 server.use(loggerMiddleware_1.default);
 server.use("/employee", auth_middleware_1.authMiddleware, employee_route_1.default);
 server.use("/auth", auth_route_1.default);
+server.use("/dept", department_route_1.default);
 server.use(error_middleware_1.errorHandler);
 server.get("/", (req, res) => {
     console.log(req.url);

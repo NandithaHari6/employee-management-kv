@@ -23,6 +23,7 @@ class EmployeeRepository {
             return this.repository.find({
                 relations: {
                     address: true,
+                    department: true
                 }
             });
         });
@@ -37,6 +38,7 @@ class EmployeeRepository {
             return this.repository.findOne({
                 relations: {
                     address: true,
+                    department: true
                 },
                 where: { id }
             });
@@ -45,6 +47,11 @@ class EmployeeRepository {
     update(id, employee) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.repository.save(Object.assign({ id }, employee));
+        });
+    }
+    updateEmpDept(employee) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.repository.save(employee);
         });
     }
     delete(id) {

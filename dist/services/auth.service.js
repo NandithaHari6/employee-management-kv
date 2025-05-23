@@ -17,14 +17,16 @@ const httpException_1 = __importDefault(require("../exception/httpException"));
 const constants_1 = require("../utils/constants");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const logger_service_1 = require("./logger.service");
 class AuthService {
     constructor(employeeService) {
         this.employeeService = employeeService;
+        this.logger = logger_service_1.LoggerService.getInstance(AuthService.name);
     }
     login(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
             const employee = yield this.employeeService.getEmployeeByEmail(email);
-            console.log(employee);
+            this.logger.info(employee);
             if (!employee) {
                 throw new httpException_1.default(404, "NO user with this mail id");
             }
@@ -38,6 +40,7 @@ class AuthService {
                 role: employee.role
             };
             const token = jsonwebtoken_1.default.sign(payload, constants_1.JWT_SECRET, { expiresIn: constants_1.JWT_VALIDITY });
+            this.logger.info(token);
             return {
                 "tokenType": "Bearer",
                 "token": token

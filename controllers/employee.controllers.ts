@@ -11,7 +11,9 @@ import checkRole from "../middlewares/authorization.middleware";
 
 
 class EmployeeController{
+  
     constructor(private employeeService:EmployeeService,private router:Router){
+
         router.get("/",this.getAllEmployees.bind(this));
         router.post("/",checkRole("HR"), this.createEmployee.bind(this));
         router.put("/:id",checkRole("HR"),this.updateEmployee.bind(this));
@@ -28,6 +30,11 @@ class EmployeeController{
       }
       const hashedPassword=await bcrypt.hash(createEmployeeDto.password,10);
       const savedEmployee = await this.employeeService.createEmployee(
+        createEmployeeDto.employeeId,
+        createEmployeeDto.dateOfJoining,
+        createEmployeeDto.experience,
+        createEmployeeDto.status,
+        createEmployeeDto.dept_id,
         createEmployeeDto.email,
         createEmployeeDto.name,
         createEmployeeDto.age,
@@ -55,10 +62,15 @@ class EmployeeController{
     //         next(err)
     //     }
     }
-    async getAllEmployees(req:Request,res:Response){
-      console.log(req.user)
-        const employees=await this.employeeService.getAllEmployees();
-        res.status(200).send(employees)
+    async getAllEmployees(req:Request,res:Response,next:NextFunction){
+      
+        try{const employees=await this.employeeService.getAllEmployees();
+        if(employees.length === 0){
+            throw new HttpException(404,"No employees to display")
+        }
+        res.status(200).send(employees)}catch(err){
+          next(err)
+        }
     }
     async getEmployeeById(req:Request,res:Response,next:NextFunction){
      try{   const id=Number(req.params.id);
@@ -100,9 +112,16 @@ class EmployeeController{
     //     await this.employeeService.updateEmployee(id,email,name,req.body.address,req.body.age);
     //     res.status(200).send("Updated")
     }
-    async deleteEmployee(req:Request,res:Response){
+    async deleteEmployee(req:Request,res:Response,next:NextFunction){
         const id=Number(req.params.id);
-        await this.employeeService.deleteEmployee(id);
+        try{
+          await this.employeeService.deleteEmployee(id);
+          res.status(200).send("Deleted");
+        }
+        catch(err){
+          next(err)
+        }
+        
     }
 }
 export default EmployeeController;
