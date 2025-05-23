@@ -40,9 +40,16 @@ class EmployeeService {
     }
     getEmployeeById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.emmployeeRepository.findOneById(id);
+            let employee = yield this.emmployeeRepository.findOneById(id);
+            if (!employee) {
+                throw new Error("Employee not found");
+            }
+            return employee;
         });
     }
+    // async getEmployeeById(id:number):Promise<Employee>{
+    //     return this.emmployeeRepository.findOneById(id);
+    // }
     getEmployeeByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.emmployeeRepository.getByMail(email);

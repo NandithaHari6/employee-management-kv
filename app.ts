@@ -5,9 +5,11 @@ import datasource from "./db/data-source";
 import { errorHandler } from "./middlewares/error.middleware";
 import authRouter from "./routes/auth.route";
 import { authMiddleware } from "./middlewares/auth.middleware";
+import { LoggerService } from "./services/logger.service";
 const { Client } = require('pg');
 
 const server = express();
+const logger=LoggerService.getInstance('app()')
 server.use(express.json());
 server.use(loggerMiddleware);
 
@@ -45,13 +47,13 @@ server.get("/", (req, res) => {
   async()=>{
     try{
       await datasource.initialize();
-      console.log("Connected")
+      logger.info("Database connected")
     }catch (e) {
-      console.error('Failed to connect', e)
+      logger.error("Failed to connect")
       process.exit(1)
     }
     server.listen(3000, () => {
-  console.log("server listening to 3000");
+  logger.info("server listening to 3000");
 });
   }
 )();

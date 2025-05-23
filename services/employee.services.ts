@@ -22,9 +22,16 @@ class EmployeeService{
     async getAllEmployees():Promise<Employee[]>{
         return this.emmployeeRepository.findMany();
     }
-    async getEmployeeById(id:number):Promise<Employee>{
-        return this.emmployeeRepository.findOneById(id);
+      async getEmployeeById(id: number): Promise<Employee | null> {
+      let employee = await this.emmployeeRepository.findOneById(id);
+    if (!employee) {
+      throw new Error("Employee not found");
     }
+    return employee;
+  }
+    // async getEmployeeById(id:number):Promise<Employee>{
+    //     return this.emmployeeRepository.findOneById(id);
+    // }
     async getEmployeeByEmail(email:string):Promise<Employee>{
         return this.emmployeeRepository.getByMail(email)
     }
