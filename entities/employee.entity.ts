@@ -41,7 +41,7 @@ class Employee extends AbstractEntity {
   })
   address: Address
 
-  @Column({ nullable: false })
+  @Column()
   password: string
 
   @Column({

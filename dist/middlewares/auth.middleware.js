@@ -10,17 +10,17 @@ const constants_1 = require("../utils/constants");
 const getToken = (req) => {
     const token = req.headers.authorization;
     if (!token)
-        throw new httpException_1.default(401, "Not authorized");
+        throw new httpException_1.default(401, "Not authorized as no token");
     const tokenSplits = token.split(" ");
     if (tokenSplits.length != 2) {
-        throw new httpException_1.default(401, "Invalid Token");
+        throw new httpException_1.default(401, "Invalid Token as format is incorrect");
     }
     return tokenSplits[1];
 };
 const authMiddleware = (req, res, next) => {
     const token = getToken(req);
     if (!token) {
-        throw new httpException_1.default(401, "Not authorized");
+        throw new httpException_1.default(401, "Not authorized as no token passed");
     }
     try {
         const payload = jsonwebtoken_1.default.verify(token, constants_1.JWT_SECRET);

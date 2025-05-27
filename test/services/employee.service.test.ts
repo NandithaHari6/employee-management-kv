@@ -3,14 +3,17 @@ import { when } from 'jest-when';
 import EmployeeRepository from "../../repositories/employee.repository";
 import EmployeeService from "../../services/employee.services"
 import Employee from "../../entities/employee.entity"
+import { DepartmentRepository } from '../../repositories/department.repository';
 
 describe('EmployeeService', () => {
     let employeeRepository: MockProxy<EmployeeRepository>;
     let employeeService: EmployeeService;
+    let departmentRepository: MockProxy<DepartmentRepository>;
     
     beforeEach(() => {
         employeeRepository = mock<EmployeeRepository>();
-        employeeService = new EmployeeService(employeeRepository)
+        departmentRepository=mock<DepartmentRepository>()
+        employeeService = new EmployeeService(employeeRepository,departmentRepository)
     })
         
         describe('getEmployeeById', () => {
@@ -29,5 +32,26 @@ describe('EmployeeService', () => {
                 expect(employeeRepository.findOneById).toHaveBeenCalledWith(2);
             })
         })
+
+        describe('getAllEmployees',()=>{
+            it(`it should return all employees present in the DB`,async()=>{
+                const mockEmpArr=[{id:3,name:'Nanditha'},{id:4,name:'Navami'}] as Employee[]
+                when(employeeRepository.findMany).calledWith().mockReturnValue(mockEmpArr)
+                //assert
+                const result=await employeeService.getAllEmployees()
+                expect(result).toStrictEqual(mockEmpArr);
+                expect(employeeRepository.findMany).toHaveBeenCalled()
+            })
+
+            it(`should throw an error when there are no employees in the DB`,async()=>{
+                const mockEmp=[] as Employee[]
+                when(employeeRepository.findMany).calledWith().mockReturnValue(mockEmp)
+                // expect(employeeRepository.findMany).toHaveBeenCalled()
+
+                expect(employeeService.getAllEmployees).toHaveLength(0)
+                
+            })
+        })
+
     
 })

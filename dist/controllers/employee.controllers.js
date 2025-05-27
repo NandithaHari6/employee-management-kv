@@ -19,15 +19,17 @@ const class_transformer_1 = require("class-transformer");
 const employee_dto_1 = require("../dto/employee.dto");
 const update_dto_1 = require("../dto/update.dto");
 const authorization_middleware_1 = __importDefault(require("../middlewares/authorization.middleware"));
+const employee_entity_1 = require("../entities/employee.entity");
 // import checkRole, { authorizationMiddleware } from "../middlewares/authorization.middleware";
 class EmployeeController {
     constructor(employeeService, router) {
         this.employeeService = employeeService;
         this.router = router;
+        this.authorizedUsers = [employee_entity_1.EmployeeRole.HR, employee_entity_1.EmployeeRole.DEVELOPER, employee_entity_1.EmployeeRole.UI];
         router.get("/", this.getAllEmployees.bind(this));
-        router.post("/", (0, authorization_middleware_1.default)("HR"), this.createEmployee.bind(this));
-        router.put("/:id", (0, authorization_middleware_1.default)("HR"), this.updateEmployee.bind(this));
-        router.delete("/:id", (0, authorization_middleware_1.default)("HR"), this.deleteEmployee.bind(this));
+        router.post("/", (0, authorization_middleware_1.default)(this.authorizedUsers), this.createEmployee.bind(this));
+        router.put("/:id", (0, authorization_middleware_1.default)(this.authorizedUsers), this.updateEmployee.bind(this));
+        router.delete("/:id", (0, authorization_middleware_1.default)(this.authorizedUsers), this.deleteEmployee.bind(this));
         router.get("/:id", this.getEmployeeById.bind(this));
     }
     createEmployee(req, res, next) {
@@ -39,6 +41,7 @@ class EmployeeController {
                     console.log(JSON.stringify(errors));
                     throw new httpException_1.default(400, JSON.stringify(errors));
                 }
+                console.log(createEmployeeDto);
                 const hashedPassword = yield bcrypt_1.default.hash(createEmployeeDto.password, 10);
                 const savedEmployee = yield this.employeeService.createEmployee(createEmployeeDto.employeeId, createEmployeeDto.dateOfJoining, createEmployeeDto.experience, createEmployeeDto.status, createEmployeeDto.dept_id, createEmployeeDto.email, createEmployeeDto.name, createEmployeeDto.age, createEmployeeDto.address, hashedPassword, createEmployeeDto.role);
                 res.status(201).send(savedEmployee);

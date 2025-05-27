@@ -9,14 +9,14 @@ import HttpException from '../exception/httpException'
 //     next();
 // }
 
-export default function checkRole(specified_role){
+export default function checkRole(authorizedRole:EmployeeRole[]){
 
 
     return ((req:Request,res:Response,next:NextFunction)=>{
     const role=req.user?.role
-    console.log(role,specified_role)
-    if(role!== specified_role){
-            throw new HttpException(403, "User has no privilage to access")
+    
+    if(!authorizedRole.includes(role)){
+            throw new HttpException(403, `User with role ${role} has no privilage to access`)
     }
     next();
 })

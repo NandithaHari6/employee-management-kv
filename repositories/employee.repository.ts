@@ -36,6 +36,7 @@ class EmployeeRepository{
     }
     async delete(id:number):Promise<void>{
         const emp=await this.repository.findOneBy({id})
+        console.log(emp)
         await this.repository.remove(emp)
     }
 

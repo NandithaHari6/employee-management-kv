@@ -57,6 +57,7 @@ class EmployeeRepository {
     delete(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const emp = yield this.repository.findOneBy({ id });
+            console.log(emp);
             yield this.repository.remove(emp);
         });
     }

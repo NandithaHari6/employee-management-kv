@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const employee_entity_1 = __importDefault(require("../entities/employee.entity"));
 const address_entitiy_1 = __importDefault(require("../entities/address.entitiy"));
 const logger_service_1 = require("./logger.service");
+const httpException_1 = __importDefault(require("../exception/httpException"));
 class EmployeeService {
     constructor(emmployeeRepository, departmentRepository) {
         this.emmployeeRepository = emmployeeRepository;
@@ -88,10 +89,11 @@ class EmployeeService {
     deleteEmployee(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const exsistingEmployee = yield this.emmployeeRepository.findOneById(id);
-            if (!exsistingEmployee) {
+            if (exsistingEmployee) {
                 yield this.emmployeeRepository.delete(id);
             }
             else {
+                throw new httpException_1.default(404, "No emp with this id");
             }
         });
     }

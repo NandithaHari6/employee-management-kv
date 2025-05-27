@@ -4,20 +4,22 @@ import {Router,Request, Response,NextFunction} from "express";
 import bcrypt from 'bcrypt';
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
+
 import { CreateEmployeeDto } from "../dto/employee.dto";
 import { UpdateEmployeeDto } from "../dto/update.dto";
 import checkRole from "../middlewares/authorization.middleware";
+import { EmployeeRole } from "../entities/employee.entity";
 // import checkRole, { authorizationMiddleware } from "../middlewares/authorization.middleware";
 
 
 class EmployeeController{
-  
+   private authorizedUsers=[EmployeeRole.HR,EmployeeRole.DEVELOPER,EmployeeRole.UI]
     constructor(private employeeService:EmployeeService,private router:Router){
 
         router.get("/",this.getAllEmployees.bind(this));
-        router.post("/",checkRole("HR"), this.createEmployee.bind(this));
-        router.put("/:id",checkRole("HR"),this.updateEmployee.bind(this));
-        router.delete("/:id",checkRole("HR"),this.deleteEmployee.bind(this));
+        router.post("/",checkRole(this.authorizedUsers), this.createEmployee.bind(this));
+        router.put("/:id",checkRole(this.authorizedUsers),this.updateEmployee.bind(this));
+        router.delete("/:id",checkRole(this.authorizedUsers),this.deleteEmployee.bind(this));
         router.get("/:id",this.getEmployeeById.bind(this));
     }
     async createEmployee(req:Request, res:Response,next:NextFunction){
@@ -28,6 +30,7 @@ class EmployeeController{
         console.log(JSON.stringify(errors));
         throw new HttpException(400, JSON.stringify(errors));
       }
+      console.log(createEmployeeDto)
       const hashedPassword=await bcrypt.hash(createEmployeeDto.password,10);
       const savedEmployee = await this.employeeService.createEmployee(
         createEmployeeDto.employeeId,
