@@ -52,6 +52,50 @@ describe('EmployeeService', () => {
                 
             })
         })
+describe('deleteEmployee', () => {
+        it("should throw exception if user with given id doesn't exist", async () => {
+            when(employeeRepository.findOneById).calledWith(1).mockReturnValue(null);
+            
+            expect(employeeService.deleteEmployee(1)).rejects.toThrow("No emp with this id");
+            expect(employeeRepository.findOneById).toHaveBeenCalledWith(1);
+        });
+
+        it("should call remove if user with given id does exist", async () => {
+            const mockEmployee = { id: 1, name: "Employee name" } as Employee;
+            when(employeeRepository.findOneById).calledWith(1).mockReturnValue(mockEmployee);
+            
+            await employeeService.deleteEmployee(mockEmployee.id);
+            
+            expect(employeeRepository.delete).toHaveBeenCalledWith(1);
+        });
+    });
+
+
+    describe('getEmployeeByEmail', () => {
+        it("should return employee when found by email", async () => {
+            const email = "test@example.com";
+            const mockEmployee = { id: 1, name: "Employee name", email: email } as Employee;
+            
+            when(employeeRepository.getByMail).calledWith(email).mockReturnValue(mockEmployee);
+
+            const result = await employeeService.getEmployeeByEmail(email);
+
+            expect(result).toEqual(mockEmployee);
+            expect(employeeRepository.getByMail).toHaveBeenCalledWith(email);
+        });
+
+        it("should return null when employee not found by email", async () => {
+            const email = "example@example.com";
+            const mockEmployee = null;
+            
+            when(employeeRepository.getByMail).calledWith(email).mockReturnValue(mockEmployee);
+
+            const result = await employeeService.getEmployeeByEmail(email);
+
+            expect(result).toEqual(mockEmployee);
+            expect(employeeRepository.getByMail).toHaveBeenCalledWith(email);
+        });
+    });
 
     
 })
